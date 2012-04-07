@@ -3,12 +3,15 @@ var exec = require('child_process').exec,
     sleep = require('sleep'),
     channel = '#cowbot';
 
+function addslashes( str,callback ) {
+    catmes = (str+'').split(/^moo/)[1].replace(/([\\"'])/g, "\\$1").replace(/\0/g, "\\0");
+    callback(catmes);
+}
+
 function cowsay(string, callback) {
-    /*
-    echo = "echo ";
-    cowsay = string.concat(" | cowsay -f cows/hacker.cow");
-    command = echo.concat(cowsay);
-    */
+    var echo = "echo ";
+    var cow = string.concat(" | cowsay -f cows/hacker.cow");
+    var command = echo.concat(cow);
     
     exec(command, function(error, stdout,stderr){
         var child = stdout;
@@ -18,7 +21,7 @@ function cowsay(string, callback) {
     });
 }
     
-var bot = new irc.Client('irc.freenode.net', 'myfbot', {
+var bot = new irc.Client('irc.freenode.net', 'cowbot', {
     debug: false,
     channels: [channel],
     realName: "James Joyce",
@@ -30,20 +33,21 @@ bot.addListener('error', function(message) {
 
 var on =false
 bot.addListener('message', function (from, to ,message) {
-    if (message.match(/moo/i)) {
-        on = true;
-    }
-    if (message.match(/mooo/i)) {
-        on = false;
-    }
-    if (on) {
-        //bot.say("#hackerschool",message);
-        cowsay(message, function(raw){
-            for (i=0;i<raw.length;i++){
-                bot.say(channel,raw[i], function(){sleep.usleep(500000);});
-            }
-
+    if (message.match(/^moo/)) {
+        addslashes(message, function (catmes) {
+                cowsay(catmes, function(raw){
+                    var counter = 0;
+                    var interval = setInterval(function () {
+                        console.log(raw[counter]);
+                        bot.say(channel,raw[counter]);
+                        counter++;
+                        if (counter>=raw.length) {
+                            clearInterval(interval);
+                        }
+                    }, 1000);
+                });
         });
     }
 });
+
 
