@@ -1,0 +1,10 @@
+{
+	"name": "Cowbot",
+	"description": "An irc bot that does hacky stuff",
+	"version": "0.1",
+	"dependencies": {
+		"irc": "0.3.4",
+		"sleep": "1.1.0"
+	},
+	"homepage": "https://github.com/myf/cowbot/"
+}
