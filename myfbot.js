@@ -9,18 +9,16 @@ function addslashes( str,callback ) {
 }
 
 function cowsay(string, callback) {
-    var echo = "echo ";
-    var cow = string.concat(" | cowsay -f cows/hacker.cow");
-    var command = echo.concat(cow);
-    
-    exec(command, function(error, stdout,stderr){
+    var command = "echo $INPUT | cowsay -f cows/hacker.cow";
+
+    exec(command, {env: {INPUT: string}}, function(error, stdout,stderr){
         var child = stdout;
         var raw = child.match(/^.*([]+|$)/gm);
         console.log(raw);
         callback(raw);
     });
 }
-    
+
 var bot = new irc.Client('irc.freenode.net', 'cowbot', {
     debug: false,
     channels: [channel],
@@ -31,7 +29,6 @@ bot.addListener('error', function(message) {
     console.error('ERROR: %s: %s', message.command, message.args.join(' '));
 });
 
-var on =false
 bot.addListener('message', function (from, to ,message) {
     if (message.match(/^moo/)) {
         addslashes(message, function (catmes) {
